@@ -1,0 +1,15 @@
+{
+    "docker_monitor": {
+        "updated_at": "2019-07-21",
+        "version": "0.0.4",
+        "local_location": "/custom_components/docker_monitor/__init__.py",
+        "remote_location": "https://raw.githubusercontent.com/Sanderhuisman/docker_monitor/master/custom_components/docker_monitor/__init__.py",
+        "visit_repo": "https://github.com/Sanderhuisman/docker_monitor",
+        "changelog": "https://github.com/Sanderhuisman/docker_monitor/releases/latest",
+        "resources": [
+            "https://raw.githubusercontent.com/Sanderhuisman/docker_monitor/master/custom_components/docker_monitor/manifest.json",
+            "https://raw.githubusercontent.com/Sanderhuisman/docker_monitor/master/custom_components/docker_monitor/sensor.py",
+            "https://raw.githubusercontent.com/Sanderhuisman/docker_monitor/master/custom_components/docker_monitor/switch.py"
+        ]
+    }
+}
