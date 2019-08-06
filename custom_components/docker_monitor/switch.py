@@ -15,73 +15,63 @@ from homeassistant.const import (
     ATTR_ATTRIBUTION,
     CONF_NAME
 )
-from homeassistant.core import ServiceCall
+from homeassistant.core import callback
+from homeassistant.util import slugify as util_slugify
 
 from .const import (
     CONF_ATTRIBUTION,
     CONF_CONTAINERS,
+    CONF_CONTAINER_SWITCH,
     CONTAINER_INFO,
     CONTAINER_INFO_STATUS,
-    DATA_CONFIG,
-    DATA_DOCKER_API,
-    DOCKER_HANDLE,
+    DOMAIN,
     ICON_SWITCH
 )
 
-VERSION = '0.0.4'
+VERSION = '0.1.0'
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def setup_platform(hass, config, add_devices_callback, discovery_info=None):
+async def async_setup_platform(
+    hass, config, async_add_entities, discovery_info=None):
     """Set up the Docker Monitor Switch."""
 
-    api = hass.data[DOCKER_HANDLE][DATA_DOCKER_API]
-    config = hass.data[DOCKER_HANDLE][DATA_CONFIG]
-    clientname = config[CONF_NAME]
+    if discovery_info is None:
+        _LOGGER.warning(
+            "To use this you need to configure the 'docker_monitor' component")
+        return
 
-    containers = [container.get_name() for container in api.get_containers()]
-    switches = [ContainerSwitch(api, clientname, name)
-                for name in config[CONF_CONTAINERS] if name in containers]
+    host_name = discovery_info[CONF_NAME]
+    api = hass.data[DOMAIN][host_name]
+
+    switches = [ContainerSwitch(host_name, api, name)
+            for name in discovery_info[CONF_CONTAINERS].keys()
+            if discovery_info[CONF_CONTAINERS][name][CONF_CONTAINER_SWITCH]]
+
     if switches:
-        add_devices_callback(switches, True)
+        async_add_entities(switches)
     else:
         _LOGGER.info("No containers setup")
-        return False
 
 
 class ContainerSwitch(SwitchDevice):
-    def __init__(self, api, clientname, container_name):
-        self._api = api
+    def __init__(self, clientname, api, name):
         self._clientname = clientname
-        self._container_name = container_name
-        self._state = False
+        self._api = api
+        self._name = name
 
-        self._container = api.get_container(container_name)
-
-        def update_callback(stats):
-            _LOGGER.debug("Received callback with message: {}".format(stats))
-
-            if stats[CONTAINER_INFO][CONTAINER_INFO_STATUS] == 'running':
-                state = True
-            else:
-                state = False
-
-            if self._state is not state:
-                self._state = state
-
-                self.schedule_update_ha_state()
-
-        self._container.stats(update_callback)
+        self._container = None
+        self._state = None
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return "{} {}".format(self._clientname, self._container_name)
+        return "{} {}".format(self._clientname, self._name)
 
     @property
     def should_poll(self):
-        return True
+        return False
 
     @property
     def icon(self):
@@ -94,11 +84,47 @@ class ContainerSwitch(SwitchDevice):
         }
 
     @property
+    def available(self):
+        """Could the device be accessed during the last update call."""
+        return self._state is not None
+
+    @property
     def is_on(self):
         return self._state
 
-    def turn_on(self, **kwargs):
-        self._container.start()
+    async def async_turn_on(self):
+        """Turn Mill unit on."""
+        if self._container:
+            try:
+                self._container.start()
+            except Exception as ex:
+                _LOGGER.info("Cannot start container ({})".format(ex))
 
-    def turn_off(self, **kwargs):
-        self._container.stop()
+    async def async_turn_off(self):
+        """Turn Mill unit off."""
+        if self._container:
+            try:
+                self._container.stop()
+            except Exception as ex:
+                _LOGGER.info("Cannot stop container ({})".format(ex))
+
+    async def async_added_to_hass(self):
+        """Register callbacks."""
+        self._container = self._api.watch_container(
+            self._name, self.event_callback)
+        self.event_callback()
+
+    def event_callback(self):
+        """Update callback."""
+
+        state = None
+        try:
+            info = self._container.get_info()
+        except Exception as ex:
+            _LOGGER.info("Cannot request container info ({})".format(ex))
+        else:
+            state = info.get(CONTAINER_INFO_STATUS) == 'running'
+
+        if state is not self._state:
+            self._state = state
+            self.async_schedule_update_ha_state()
