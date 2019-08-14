@@ -8,6 +8,7 @@ from .const import (
     CONTAINER_INFO_IMAGE,
     CONTAINER_INFO_STARTED,
     CONTAINER_INFO_STATUS,
+    CONTAINER_INFO_NETWORKMODE,
     EVENT_INFO_CONTAINER,
     EVENT_INFO_ID,
     EVENT_INFO_IMAGE,
@@ -184,6 +185,8 @@ class ContainerData:
                 parser.parse(self._container.attrs['Created']),
             CONTAINER_INFO_STARTED:
                 parser.parse(self._container.attrs['State']['StartedAt']),
+            CONTAINER_INFO_NETWORKMODE:
+                True if self._container.attrs['HostConfig']['NetworkMode'] == 'host' else False
         }
 
         return info
@@ -259,7 +262,8 @@ class DockerContainerStats(threading.Thread):
             _LOGGER.info("Stats runner")
             try:
                 for name, container in self._api._containers.items():
-                    status = container.get_info()[CONTAINER_INFO_STATUS]
+                    containerinfo = container.get_info()
+                    status = containerinfo[CONTAINER_INFO_STATUS]
 
                     stats = None
                     if status in ('running', 'paused'):
@@ -269,7 +273,7 @@ class DockerContainerStats(threading.Thread):
                                 name).stats(stream=True, decode=True)
 
                         for raw in streams[name]:
-                            stats = self.__parse_stats(name, raw)
+                            stats = self.__parse_stats(name, containerinfo[CONTAINER_INFO_NETWORKMODE], raw)
 
                             # Break from event to streams other streams
                             break
@@ -294,7 +298,7 @@ class DockerContainerStats(threading.Thread):
         for stream in streams.values():
             stream.close()
 
-    def __parse_stats(self, name, raw):
+    def __parse_stats(self, name, networkmode, raw):
         from dateutil import parser
 
         stats = {}
@@ -348,16 +352,17 @@ class DockerContainerStats(threading.Thread):
 
         # Network stats
         network = {}
-        try:
-            network['total_tx'] = 0
-            network['total_rx'] = 0
-            for if_name, data in raw["networks"].items():
-                network['total_tx'] += data["tx_bytes"]
-                network['total_rx'] += data["rx_bytes"]
-        except KeyError as e:
-            # raw_stats do not have network information
-            _LOGGER.debug(
-                "Cannot grab network usage for container {} ({})".format(name, e))
+        if not networkmode:
+            try:
+                network['total_tx'] = 0
+                network['total_rx'] = 0
+                for if_name, data in raw["networks"].items():
+                    network['total_tx'] += data["tx_bytes"]
+                    network['total_rx'] += data["rx_bytes"]
+            except KeyError as e:
+                # raw_stats do not have network information
+                _LOGGER.debug(
+                    "Cannot grab network usage for container {} ({})".format(name, e))
 
         stats['cpu'] = cpu
         stats['memory'] = memory
