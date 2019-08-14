@@ -335,7 +335,7 @@ class DockerContainerStats(threading.Thread):
         # Memory stats
         memory = {}
         try:
-            memory['usage'] = raw['memory_stats']['usage']
+            memory['usage'] = raw['memory_stats']['usage'] - raw['memory_stats']['stats']['cache']
             memory['limit'] = raw['memory_stats']['limit']
             memory['max_usage'] = raw['memory_stats']['max_usage']
         except (KeyError, TypeError) as e:
