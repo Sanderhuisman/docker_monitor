@@ -186,7 +186,7 @@ class ContainerData:
             CONTAINER_INFO_STARTED:
                 parser.parse(self._container.attrs['State']['StartedAt']),
             CONTAINER_INFO_NETWORKMODE:
-                True if self._container.attrs['HostConfig']['NetworkMode'] == 'host' else False
+                self._container.attrs['HostConfig']['NetworkMode'] == 'host'
         }
 
         return info
@@ -273,7 +273,7 @@ class DockerContainerStats(threading.Thread):
                                 name).stats(stream=True, decode=True)
 
                         for raw in streams[name]:
-                            stats = self.__parse_stats(name, containerinfo[CONTAINER_INFO_NETWORKMODE], raw)
+                            stats = self.__parse_stats(name, containerinfo, raw)
 
                             # Break from event to streams other streams
                             break
@@ -298,7 +298,7 @@ class DockerContainerStats(threading.Thread):
         for stream in streams.values():
             stream.close()
 
-    def __parse_stats(self, name, networkmode, raw):
+    def __parse_stats(self, name, containerinfo, raw):
         from dateutil import parser
 
         stats = {}
@@ -352,7 +352,7 @@ class DockerContainerStats(threading.Thread):
 
         # Network stats
         network = {}
-        if not networkmode:
+        if not containerinfo[CONTAINER_INFO_NETWORKMODE]:
             try:
                 network['total_tx'] = 0
                 network['total_rx'] = 0
