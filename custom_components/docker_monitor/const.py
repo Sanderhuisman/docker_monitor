@@ -16,6 +16,11 @@ CONF_CONTAINERS = 'containers'
 CONF_CONTAINER_SWITCH = 'switch'
 
 CONF_MONITOR_UTILISATION_VERSION = 'version'
+CONF_MONITOR_UTILISATION_CONTAINERS_TOTAL = 'containers_total'
+CONF_MONITOR_UTILISATION_CONTAINERS_PAUSED = 'containers_paused'
+CONF_MONITOR_UTILISATION_CONTAINERS_RUNNING = 'containers_running'
+CONF_MONITOR_UTILISATION_CONTAINERS_STOPPED = 'containers_stopped'
+CONF_MONITOR_UTILISATION_IMAGES_TOTAL = 'images_total'
 
 CONF_MONITOR_CONTAINER_STATUS = 'status'
 CONF_MONITOR_CONTAINER_UPTIME = 'uptime'
@@ -29,6 +34,16 @@ CONF_MONITOR_CONTAINER_NETWORK_TOTAL_DOWN = 'network_total_down'
 CONF_MONITOR_UTILISATION_CONDITIONS = {
     CONF_MONITOR_UTILISATION_VERSION:
         ['Version', None, 'mdi:information-outline', None],
+    CONF_MONITOR_UTILISATION_CONTAINERS_TOTAL:
+        ['Containers Total', None, 'mdi:docker', None],
+    CONF_MONITOR_UTILISATION_CONTAINERS_PAUSED:
+        ['Containers Paused', None, 'mdi:docker', None],
+    CONF_MONITOR_UTILISATION_CONTAINERS_RUNNING:
+        ['Containers Running', None, 'mdi:docker', None],
+    CONF_MONITOR_UTILISATION_CONTAINERS_STOPPED:
+        ['Containers Stopped', None, 'mdi:docker', None],
+    CONF_MONITOR_UTILISATION_IMAGES_TOTAL:
+        ['Images Total', None, 'mdi:information-outline', None],
 }
 
 CONF_MONITOR_CONTAINER_CONDITIONS = {
@@ -67,6 +82,12 @@ VERSION_INFO_API_VERSION = 'api_version'
 VERSION_INFO_OS = 'os'
 VERSION_INFO_ARCHITECTURE = 'arch'
 VERSION_INFO_KERNEL = 'kernel'
+VERSION_INFO_CONTAINERS_TOTAL = 'containers_total'
+VERSION_INFO_CONTAINERS_PAUSED = 'containers_paused'
+VERSION_INFO_CONTAINERS_RUNNING = 'containers_running'
+VERSION_INFO_CONTAINERS_STOPPED = 'containers_stopped'
+VERSION_INFO_IMAGES = 'images_total'
+VERSION_INFO_MEMTOTAL = 'memory_total'
 
 CONTAINER_INFO = 'info'
 CONTAINER_INFO_ID = 'id'
