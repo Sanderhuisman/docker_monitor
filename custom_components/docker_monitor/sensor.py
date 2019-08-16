@@ -67,8 +67,6 @@ from .const import (
     CONF_MONITOR_UTILISATION_IMAGES_TOTAL,
 )
 
-VERSION = '0.1.0-b0'
-
 _LOGGER = logging.getLogger(__name__)
 
 

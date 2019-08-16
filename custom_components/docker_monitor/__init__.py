@@ -34,8 +34,6 @@ from .const import (
 )
 from .helpers import DockerMonitorApi
 
-VERSION = '0.1.0-b0'
-
 _LOGGER = logging.getLogger(__name__)
 
 CONF_MONITOR_UTILISATION_CONDITIONS_KEYS = list(
