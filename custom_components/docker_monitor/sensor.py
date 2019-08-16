@@ -257,7 +257,7 @@ class DockerContainerSensor(Entity):
         except Exception as ex:
             _LOGGER.info("Cannot request container info ({})".format(ex))
         else:
-            if info and stats:
+            if info:
                 state = STATE_UNAVAILABLE
 
                 if self._var_id == CONF_MONITOR_CONTAINER_STATUS:
@@ -310,3 +310,5 @@ class DockerContainerSensor(Entity):
                 # if self._state is not state:
                 self._state = state
                 self.async_schedule_update_ha_state()
+            else:
+                _LOGGER.error("No Docker information available for '%s' and '%s'", self._name, self._var_id)
