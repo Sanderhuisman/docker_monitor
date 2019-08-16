@@ -84,6 +84,12 @@ docker_monitor:
 | --------------------------------- | ------------------------------- | ----- |
 | version                           | Docker version                  | -     |
 
+| containers_total                  | Total number of containers      | -     |
+| containers_paused                 | Number of paused containers     | -     |
+| containers_running                | Number of running containers    | -     |
+| containers_stopped                | Number of stopped containers    | -     |
+| images_total                      | Total number of images          | -     |
+
 | Container Conditions              | Description                     | Unit  |
 | --------------------------------- | ------------------------------- | ----- |
 | status                            | Container status                | -     |

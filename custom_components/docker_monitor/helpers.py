@@ -6,16 +6,22 @@ from .const import (
     CONTAINER_INFO_CREATED,
     CONTAINER_INFO_ID,
     CONTAINER_INFO_IMAGE,
+    CONTAINER_INFO_NETWORKMODE,
     CONTAINER_INFO_STARTED,
     CONTAINER_INFO_STATUS,
-    CONTAINER_INFO_NETWORKMODE,
     EVENT_INFO_CONTAINER,
     EVENT_INFO_ID,
     EVENT_INFO_IMAGE,
     EVENT_INFO_STATUS,
     VERSION_INFO_API_VERSION,
     VERSION_INFO_ARCHITECTURE,
+    VERSION_INFO_CONTAINERS_PAUSED,
+    VERSION_INFO_CONTAINERS_RUNNING,
+    VERSION_INFO_CONTAINERS_STOPPED,
+    VERSION_INFO_CONTAINERS_TOTAL,
+    VERSION_INFO_IMAGES,
     VERSION_INFO_KERNEL,
+    VERSION_INFO_MEMTOTAL,
     VERSION_INFO_OS,
     VERSION_INFO_VERSION
 )
@@ -72,22 +78,29 @@ class DockerMonitorApi:
         return self._containers[name]
 
     def get_info(self):
-        version = {}
+        result = {}
         try:
             raw_stats = self._client.version()
-            version = {
+            info = self._client.info()
+            result = {
                 VERSION_INFO_VERSION: raw_stats.get('Version', None),
                 VERSION_INFO_API_VERSION: raw_stats.get('ApiVersion', None),
                 VERSION_INFO_OS: raw_stats.get('Os', None),
                 VERSION_INFO_ARCHITECTURE: raw_stats.get('Arch', None),
                 VERSION_INFO_KERNEL: raw_stats.get('KernelVersion', None),
+                VERSION_INFO_CONTAINERS_TOTAL : info.get('Containers', None),
+                VERSION_INFO_CONTAINERS_PAUSED : info.get('ContainersPaused', None),
+                VERSION_INFO_CONTAINERS_RUNNING : info.get('ContainersRunning', None),
+                VERSION_INFO_CONTAINERS_STOPPED : info.get('ContainersStopped', None),
+                VERSION_INFO_IMAGES : info.get('Images', None),
+                VERSION_INFO_MEMTOTAL : info.get('MemTotal', None),
             }
         except Exception as e:
             _LOGGER.info("Cannot get docker daemon info")
             _LOGGER.debug("Request exception: {}".format(e))
             raise ConnectionError("Cannot request info")
 
-        return version
+        return result
 
 
 class DockerContainerEventListener(threading.Thread):

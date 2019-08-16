@@ -54,7 +54,17 @@ from .const import (
     VERSION_INFO_ARCHITECTURE,
     VERSION_INFO_KERNEL,
     VERSION_INFO_OS,
-    VERSION_INFO_VERSION
+    VERSION_INFO_VERSION,
+    VERSION_INFO_CONTAINERS_TOTAL,
+    VERSION_INFO_CONTAINERS_PAUSED,
+    VERSION_INFO_CONTAINERS_RUNNING,
+    VERSION_INFO_CONTAINERS_STOPPED,
+    VERSION_INFO_IMAGES,
+    CONF_MONITOR_UTILISATION_CONTAINERS_TOTAL,
+    CONF_MONITOR_UTILISATION_CONTAINERS_PAUSED,
+    CONF_MONITOR_UTILISATION_CONTAINERS_RUNNING,
+    CONF_MONITOR_UTILISATION_CONTAINERS_STOPPED,
+    CONF_MONITOR_UTILISATION_IMAGES_TOTAL,
 )
 
 VERSION = '0.1.0-b0'
@@ -161,6 +171,16 @@ class DockerUtilSensor(Entity):
                         VERSION_INFO_OS, None)
                     self._attributes[ATTR_VERSION_ARCH] = version.get(
                         VERSION_INFO_ARCHITECTURE, None)
+                elif self._var_id == CONF_MONITOR_UTILISATION_CONTAINERS_TOTAL:
+                    self._state = version.get(VERSION_INFO_CONTAINERS_TOTAL, None)
+                elif self._var_id == CONF_MONITOR_UTILISATION_CONTAINERS_PAUSED:
+                    self._state = version.get(VERSION_INFO_CONTAINERS_PAUSED, None)
+                elif self._var_id == CONF_MONITOR_UTILISATION_CONTAINERS_RUNNING:
+                    self._state = version.get(VERSION_INFO_CONTAINERS_RUNNING, None)
+                elif self._var_id == CONF_MONITOR_UTILISATION_CONTAINERS_STOPPED:
+                    self._state = version.get(VERSION_INFO_CONTAINERS_STOPPED, None)
+                elif self._var_id == CONF_MONITOR_UTILISATION_IMAGES_TOTAL:
+                    self._state = version.get(VERSION_INFO_IMAGES, None)
             else:
                 self._state = None
                 self._attributes = None
