@@ -30,7 +30,9 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     EVENT_CONTAINER,
-    PLATFORMS
+    PLATFORMS,
+    SERVICE_EXEC,
+    SERVICE_RUN
 )
 from .helpers import DockerMonitorApi
 
@@ -99,6 +101,42 @@ def setup(hass, config):
                 api.start(event_listener)
             else:
                 api.start()
+
+    async def async_service_handler(service):
+        """Handle service calls."""
+        name = service.data.get(CONF_NAME, None)
+        if name:
+            if service.service == SERVICE_RUN:
+                _LOGGER.error("Run on host {}".format(name))
+                # client.containers.run('alpine', 'echo hello world')
+                # container = client.containers.run('bfirsh/reticulate-splines', detach=True)
+            elif service.service == SERVICE_EXEC:
+                _LOGGER.error("Exec on host {}".format(name))
+            else:
+                _LOGGER.error("Service {} not found".format(service.service))
+
+    SERVICE_SCHEMA = vol.Schema({
+        vol.Required(CONF_NAME):
+            vol.All(cv.string, vol.In([host[CONF_NAME] for host in config[DOMAIN][CONF_HOSTS]]))
+    })
+
+    service_runschema = SERVICE_SCHEMA.extend({
+        vol.Required('image'):
+            cv.string,
+        vol.Optional('command'):
+            cv.string,
+        vol.Optional('remove'):
+            cv.boolean,
+    })
+    service_exec_schema = SERVICE_SCHEMA.extend({
+        vol.Required('container'):
+            cv.string,
+        vol.Required('command'):
+            cv.boolean,
+    })
+
+    hass.services.async_register(DOMAIN, SERVICE_RUN, async_service_handler, schema=service_runschema)
+    hass.services.async_register(DOMAIN, SERVICE_EXEC, async_service_handler, schema=service_exec_schema)
 
     def monitor_stop(_service_or_event):
         """Stop the monitor threads."""

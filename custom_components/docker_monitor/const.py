@@ -65,6 +65,9 @@ CONF_MONITOR_CONTAINER_CONDITIONS = {
         ['Network total Down', 'MB', 'mdi:download', None],
 }
 
+SERVICE_EXEC = 'exec'
+SERVICE_RUN = 'run'
+
 ATTR_CREATED = 'Created'
 ATTR_IMAGE = 'Image'
 ATTR_MEMORY_LIMIT = 'Memory_limit'

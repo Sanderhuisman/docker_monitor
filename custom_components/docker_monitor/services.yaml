@@ -1,0 +1,28 @@
+run:
+  description: Run a new command in a running container.
+  fields:
+    name:
+      description: Name of docker host.
+      example: 'Docker'
+    image:
+      description: 'Image name'
+      example: 'homeassistant/home-assistant:latest'
+    command:
+      description: Command to execute (optional).
+      example: 'echo hello world'
+    remove:
+      description: Remove the container when it has finished running (optional; default false).
+      example: True
+
+exec:
+  description: Run a command inside a container.
+  fields:
+    name:
+      description: Name of docker host.
+      example: 'Docker'
+    container:
+      description: Name of docker container.
+      example: 'homeassistant_homeassistant_1'
+    command:
+      description: Command to execute.
+      example: 'echo hello-world'
