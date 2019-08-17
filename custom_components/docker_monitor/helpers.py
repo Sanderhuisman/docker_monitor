@@ -273,12 +273,13 @@ class DockerContainerStats(threading.Thread):
         streams = {}
         while not self._stopper.isSet():
             _LOGGER.info("Stats runner")
-            try:
-                for name, container in self._api._containers.items():
+            for name, container in self._api._containers.items():
+                # Empty stats
+                stats = None
+                try:
                     containerinfo = container.get_info()
                     status = containerinfo[CONTAINER_INFO_STATUS]
 
-                    stats = None
                     if status in ('running', 'paused'):
                         _LOGGER.info("Running {}".format(name))
                         if name not in streams:
@@ -298,11 +299,20 @@ class DockerContainerStats(threading.Thread):
                         # Remove old stats from this container
                         if name in self._old:
                             self._old.pop(name)
+                except Exception as ex:
+                    _LOGGER.error("Cannot get docker container info")
+                    _LOGGER.debug("Request exception: {}".format(ex))
 
-                    container.set_stats(stats)
-            except Exception as ex:
-                _LOGGER.info("Cannot get docker container")
-                _LOGGER.debug("Request exception: {}".format(ex))
+                    if name in streams:
+                        # Close stream as we cannot access container
+                        streams[name].close()
+                        streams.pop(name)
+
+                        # Remove old stats from this container
+                        if name in self._old:
+                            self._old.pop(name)
+
+                container.set_stats(stats)
 
             # Wait before read
             self._stopper.wait(self._interval)
