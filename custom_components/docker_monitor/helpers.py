@@ -273,7 +273,8 @@ class DockerContainerStats(threading.Thread):
         streams = {}
         while not self._stopper.isSet():
             _LOGGER.info("Stats runner")
-            for name, container in self._api._containers.items():
+            containers = self._api._containers
+            for name, container in containers.items():
                 # Empty stats
                 stats = None
                 try:
