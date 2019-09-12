@@ -1,7 +1,7 @@
 {
     "docker_monitor": {
-        "updated_at": "2019-08-15",
-        "version": "0.1.0-b0",
+        "updated_at": "2019-09-12",
+        "version": "0.1.2",
         "local_location": "/custom_components/docker_monitor/__init__.py",
         "remote_location": "https://raw.githubusercontent.com/Sanderhuisman/docker_monitor/develop/custom_components/docker_monitor/__init__.py",
         "visit_repo": "https://github.com/Sanderhuisman/docker_monitor",
