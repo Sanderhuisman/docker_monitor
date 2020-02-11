@@ -30,42 +30,75 @@ To use the `docker_monitor` in your installation, add the following to your `con
 ```yaml
 # Example configuration.yaml entry
 docker_monitor:
-  containers:
-    - homeassistant_homeassistant_1
-    - homeassistant_mariadb_1
-    - homeassistant_mosquitto_1
-  monitored_conditions:
-    - utilization_version
-    - container_status
-    - container_memory_usage
-    - container_memory_percentage_usage
-    - container_cpu_percentage_usage
+  hosts:
+    - url: unix://var/run/docker.sock
+      name: Docker
+      event: true
+      monitored_conditions:
+        - version
+      containers:
+        homeassistant_homeassistant_1:
+          switch: False
+          sensors:
+            - status
+            - uptime
+            - cpu_percentage_usage
+            - memory_usage
+            - memory_percentage_usage
+            - network_total_up
+            - network_total_down
+        homeassistant_database_1:
+          switch: False
+          sensors:
+            - status
+            - uptime
+            - cpu_percentage_usage
+            - memory_usage
+            - memory_percentage_usage
+            - network_total_up
+            - network_total_down
+        homeassistant_mosquitto_1:
+          switch: True
+          sensors:
+            - status
+            - uptime
+            - cpu_percentage_usage
+            - memory_usage
+            - memory_percentage_usage
+            - network_total_up
+            - network_total_down
 ```
 
 #### Configuration variables
 
 | Parameter            | Type                     | Description                                                           |
 | -------------------- | ------------------------ | --------------------------------------------------------------------- |
-| name                 | string       (Optional)  | Client name of Docker daemon. Defaults to `Docker`.                   |
-| url                  | string       (Optional)  | Host URL of Docker daemon. Defaults to `unix://var/run/docker.sock`.  |
+| name                 | string       (Required)  | Client name of Docker daemon. Defaults to `Docker`.                   |
+| url                  | string       (Required)  | Host URL of Docker daemon. Defaults to `unix://var/run/docker.sock`.  |
+| event                | boolean      (Optional)  | Listen for events from Docker. Defaults to false.                     |
 | scan_interval        | time_period  (Optional)  | Update interval. Defaults to 10 seconds.                              |
-| events               | boolean      (Optional)  | Listen for events from Docker. Defaults to false.                     |
-| containers           | list         (Optional)  | Array of containers to monitor. Defaults to all containers.           |
 | monitored_conditions | list         (Optional)  | Array of conditions to be monitored. Defaults to all conditions       |
+| containers           | list         (Required)  | Array of containers to monitor. Defaults to all containers.           |
 
-| Condition                         | Description                     | Unit  |
+| Monitored Conditions              | Description                     | Unit  |
 | --------------------------------- | ------------------------------- | ----- |
-| utilization_version               | Docker version                  | -     |
-| container_status                  | Container status                | -     |
-| container_uptime                  | Container start time            | -     |
-| container_image                   | Container image                 | -     |
-| container_cpu_percentage_usage    | CPU usage                       | %     |
-| container_memory_usage            | Memory usage                    | MB    |
-| container_memory_percentage_usage | Memory usage                    | %     |
-| container_network_speed_up        | Network total speed upstream    | kB/s  |
-| container_network_speed_down      | Network total speed downstream  | kB/s  |
-| container_network_total_up        | Network total upstream          | MB    |
-| container_network_total_down      | Network total downstream        | MB    |
+| version                           | Docker version                  | -     |
+| containers_total                  | Total number of containers      | -     |
+| containers_paused                 | Number of paused containers     | -     |
+| containers_running                | Number of running containers    | -     |
+| containers_stopped                | Number of stopped containers    | -     |
+| images_total                      | Total number of images          | -     |
+
+| Container Conditions              | Description                     | Unit  |
+| --------------------------------- | ------------------------------- | ----- |
+| status                            | Container status                | -     |
+| uptime                            | Container start time            | -     |
+| image                             | Container image                 | -     |
+| cpu_percentage_usage              | CPU usage                       | %     |
+| memory_usage                      | Memory usage                    | MB    |
+| memory_percentage_usage           | Memory usage                    | %     |
+| network_total_up                  | Network total upstream          | MB    |
+| network_total_down                | Network total downstream        | MB    |
 
 ## Credits
 
