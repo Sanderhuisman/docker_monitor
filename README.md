@@ -2,6 +2,10 @@
 
 [![maintainer](https://img.shields.io/badge/maintainer-Sander%20Huisman%20-blue.svg?style=for-the-badge)](https://github.com/Sanderhuisman)
 
+# Depcrecated
+
+This component has been deprecated in favor of [@ualex73](https://github.com/ualex73/monitor_docker) his component. This component is not longer maintained and I stronly advise to switch over to the one of ualex73.
+
 ## About
 
 This repository contains the docker monitor component I developed for my own [Home-Assistant](https://www.home-assistant.io) setup. Feel free to use the component and report bugs if you find them. If you want to contribute, please report a bug or pull request and I will reply as soon as possible. Please star & watch my project such I can see how many people like my components and for you to stay in the loop as updates come along.
